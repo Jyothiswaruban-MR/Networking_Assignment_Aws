@@ -47,7 +47,15 @@ jobs:
           username: ubuntu
           key: ${{ secrets.EC2_PRIVATE_KEY }}
           script: |
+            # Log in to AWS ECR
+            aws ecr get-login-password --region us-east-1 | sudo docker login --username AWS --password-stdin 539247459542.dkr.ecr.us-east-1.amazonaws.com
+      
+            # Pull the Docker image from ECR
             sudo docker pull 539247459542.dkr.ecr.us-east-1.amazonaws.com/nginx-web-app:latest
+      
+            # Stop and remove the existing container (if any)
             sudo docker stop $(sudo docker ps -q --filter ancestor=539247459542.dkr.ecr.us-east-1.amazonaws.com/nginx-web-app:latest)
             sudo docker rm $(sudo docker ps -a -q --filter ancestor=539247459542.dkr.ecr.us-east-1.amazonaws.com/nginx-web-app:latest)
+      
+            # Run the new container
             sudo docker run -d -p 8080:80 539247459542.dkr.ecr.us-east-1.amazonaws.com/nginx-web-app:latest
