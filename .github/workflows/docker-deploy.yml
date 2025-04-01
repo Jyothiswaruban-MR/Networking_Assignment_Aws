@@ -49,16 +49,16 @@ jobs:
           script: |
             # Log in to AWS ECR (AWS CLI is already installed)
             aws ecr get-login-password --region us-east-1 | sudo docker login --username AWS --password-stdin 539247459542.dkr.ecr.us-east-1.amazonaws.com
-            
+      
             # Pull the Docker image from ECR
             sudo docker pull 539247459542.dkr.ecr.us-east-1.amazonaws.com/nginx-web-app:latest
-            
-            # Stop and remove the existing container (if any)
-            container_id=$(sudo docker ps -q --filter ancestor=539247459542.dkr.ecr.us-east-1.amazonaws.com/nginx-web-app:latest)
+      
+            # Stop and remove the existing container using port 8080
+            container_id=$(sudo docker ps -q --filter "publish=8080")
             if [ -n "$container_id" ]; then
                 sudo docker stop $container_id
                 sudo docker rm $container_id
             fi
-            
+      
             # Run the new container
             sudo docker run -d -p 8080:80 539247459542.dkr.ecr.us-east-1.amazonaws.com/nginx-web-app:latest
